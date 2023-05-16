@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.userdetails.User;
 
+import java.util.List;
+
 @Entity
 @NoArgsConstructor
 public class Task {
@@ -14,6 +16,9 @@ public class Task {
     private String title;
     private boolean isComplete;
     private User user;
+
+    @OneToMany(mappedBy = "task")
+    private List<AttributeValue> attributeValues;
 
     public Task(String title, boolean complete, User user) {
         this.title = title;

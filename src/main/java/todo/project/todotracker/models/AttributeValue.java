@@ -20,7 +20,7 @@ public class AttributeValue {
     @JoinColumn(name = "attribute_id")
     private AdditionalAttribute attribute;
 
-    private String varchar;
+    private String string;
     private int numInt;
     private double numDouble;
     private boolean bool;
@@ -43,12 +43,12 @@ public class AttributeValue {
         this.task = task;
     }
 
-    public String getVarchar() {
-        return varchar;
+    public String getString() {
+        return string;
     }
 
-    public void setVarchar(String varchar) {
-        this.varchar = varchar;
+    public void setString(String string) {
+        this.string = string;
     }
 
     public int getNumInt() {

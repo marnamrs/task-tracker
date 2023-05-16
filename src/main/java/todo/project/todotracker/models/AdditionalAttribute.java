@@ -5,6 +5,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.userdetails.User;
 import todo.project.todotracker.utils.Type;
 
+import java.util.List;
+
 @Entity
 @NoArgsConstructor
 public class AdditionalAttribute {
@@ -19,6 +21,9 @@ public class AdditionalAttribute {
     private Type type;
 
     private User user;
+
+    @OneToMany(mappedBy = "attribute")
+    private List<AttributeValue> values;
 
     public AdditionalAttribute(String name, Type type, User user) {
         this.name = name;
