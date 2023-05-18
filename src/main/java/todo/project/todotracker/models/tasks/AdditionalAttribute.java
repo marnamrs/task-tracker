@@ -1,34 +1,42 @@
-package todo.project.todotracker.models;
+package todo.project.todotracker.models.tasks;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import org.springframework.security.core.userdetails.User;
-import todo.project.todotracker.utils.Type;
+
+import todo.project.todotracker.models.users.User;
+import todo.project.todotracker.utils.DataType;
 
 import java.util.List;
 
+/**
+ * AdditionalAttribute:
+ * Additional fields/columns created by Users
+ * */
+
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
 public class AdditionalAttribute {
-
+    /**
+     * The primary key for the AdditionalAttribute table
+     * Ids are automatically generated as sequential integers
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String name;
-
     @Enumerated
-    private Type type;
-
+    private DataType type;
+    @ManyToOne
     private User user;
-
     @OneToMany(mappedBy = "attribute")
     private List<AttributeValue> values;
 
-    public AdditionalAttribute(String name, Type type, User user) {
-        this.name = name;
-        this.type = type;
-        this.user = user;
+    public AdditionalAttribute(String name, DataType type, User user) {
+        setName(name);
+        setType(type);
+        setUser(user);
     }
 
     public Long getId() {
@@ -43,11 +51,11 @@ public class AdditionalAttribute {
         this.name = name;
     }
 
-    public Type getType() {
+    public DataType getType() {
         return type;
     }
 
-    public void setType(Type type) {
+    public void setType(DataType type) {
         this.type = type;
     }
 

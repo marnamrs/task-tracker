@@ -1,8 +1,14 @@
-package todo.project.todotracker.models;
+package todo.project.todotracker.models.tasks;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+
+
+/**
+ * AttributeValue:
+ * Values of the additional fields/columns created by Users
+ * */
 
 @Entity
 @NoArgsConstructor
@@ -25,7 +31,11 @@ public class AttributeValue {
     private double numDouble;
     private boolean bool;
 
-
+    public AttributeValue(Task task, AdditionalAttribute attribute) {
+        setTask(task);
+        setAttribute(attribute);
+        task.setLastEdit();
+    }
 
     public AdditionalAttribute getAttribute() {
         return attribute;
