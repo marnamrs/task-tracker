@@ -12,7 +12,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     List<Task> findByTitleContainingIgnoreCase(String query);
     List<Task> findByUser(String username);
 
-    //TODO Pageable and PageRequest(p, size, sort)
+    // TODO Pageable and PageRequest(p, size, sort)
     //Page<T> foo(Pageable pageable)
 
 }
