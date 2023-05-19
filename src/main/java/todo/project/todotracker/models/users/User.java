@@ -37,7 +37,7 @@ public class User {
      * Additional fields/columns created by the User
      * */
     @OneToMany(mappedBy = "user")
-    private List<AdditionalField> additionalAttributes;
+    private List<AdditionalField> additionalFields;
 
     public User(String name, String username, String password, Address address, Role role) {
         setName(name);

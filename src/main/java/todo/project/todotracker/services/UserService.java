@@ -15,8 +15,7 @@ import todo.project.todotracker.repositories.UserRepository;
 import todo.project.todotracker.utils.RoleType;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+
 
 @Service
 @Slf4j

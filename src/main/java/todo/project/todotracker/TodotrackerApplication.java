@@ -8,11 +8,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import todo.project.todotracker.models.tasks.Task;
 import todo.project.todotracker.models.users.Address;
 import todo.project.todotracker.models.users.Role;
 import todo.project.todotracker.models.users.User;
 import todo.project.todotracker.models.users.UserDTO;
 import todo.project.todotracker.repositories.RoleRepository;
+import todo.project.todotracker.repositories.TaskRepository;
 import todo.project.todotracker.repositories.UserRepository;
 import todo.project.todotracker.services.UserService;
 import todo.project.todotracker.utils.RoleType;
@@ -35,6 +37,8 @@ public class TodotrackerApplication {
 	RoleRepository roleRepository;
 	@Autowired
 	UserRepository userRepository;
+	@Autowired
+	private TaskRepository taskRepository;
 
 
 	@Bean
@@ -53,6 +57,15 @@ public class TodotrackerApplication {
 			 */
 			if(userRepository.findAll().isEmpty() || userRepository.findByRole(roleRepository.findByRoleType(RoleType.ADMIN).get()).isEmpty()){
 				userService.createUser(new UserDTO("Name","user","1234","ADMIN","Spain", "Barcelona", "Street", "000"));
+			}
+
+			/* DEFAULT TASKS
+			* Populates database with tasks for demo purpose, if none are found.
+			* */
+			if(taskRepository.findAll().isEmpty() ){
+				taskRepository.save(new Task("To do: create your first task", false, userRepository.findByUsername("user").get()));
+				taskRepository.save(new Task("To do: complete your first task", false, userRepository.findByUsername("user").get()));
+				taskRepository.save(new Task("To do: take a break", false, userRepository.findByUsername("user").get()));
 			}
 
 		};
