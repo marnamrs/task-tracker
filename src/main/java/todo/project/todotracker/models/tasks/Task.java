@@ -30,7 +30,7 @@ public class Task {
      * Values for additional fields created by User
      * */
     @OneToMany(mappedBy = "task")
-    private List<AttributeValue> attributeValues;
+    private List<AdditionalValue> attributeValues;
 
     public Task(String title, boolean complete, User user) {
         setTitle(title);

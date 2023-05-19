@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import todo.project.todotracker.models.tasks.AdditionalAttribute;
+import todo.project.todotracker.models.tasks.AdditionalField;
 import todo.project.todotracker.models.tasks.Task;
 
 import java.util.List;
@@ -37,7 +37,7 @@ public class User {
      * Additional fields/columns created by the User
      * */
     @OneToMany(mappedBy = "user")
-    private List<AdditionalAttribute> additionalAttributes;
+    private List<AdditionalField> additionalAttributes;
 
 
 }

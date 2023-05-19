@@ -1,9 +1,14 @@
 package todo.project.todotracker.models.users;
 
 import jakarta.persistence.*;
+import lombok.*;
 import todo.project.todotracker.utils.RoleType;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Role {
     /**
      * The primary key for the Role table

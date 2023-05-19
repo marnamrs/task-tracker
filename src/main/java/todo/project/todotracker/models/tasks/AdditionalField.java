@@ -17,7 +17,7 @@ import java.util.List;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class AdditionalAttribute {
+public class AdditionalField {
     /**
      * The primary key for the AdditionalAttribute table
      * Ids are automatically generated as sequential integers
@@ -30,10 +30,10 @@ public class AdditionalAttribute {
     private DataType type;
     @ManyToOne
     private User user;
-    @OneToMany(mappedBy = "attribute")
-    private List<AttributeValue> values;
+    @OneToMany(mappedBy = "field")
+    private List<AdditionalValue> values;
 
-    public AdditionalAttribute(String name, DataType type, User user) {
+    public AdditionalField(String name, DataType type, User user) {
         setName(name);
         setType(type);
         setUser(user);
