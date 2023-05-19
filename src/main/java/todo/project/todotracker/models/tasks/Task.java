@@ -14,10 +14,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Task {
-    /**
-     * The primary key for the Task table
-     * Ids are automatically generated as sequential integers
-     */
+    /* The primary key for the Task table
+     * Ids are automatically generated as sequential integers */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,12 +24,17 @@ public class Task {
     @ManyToOne
     private User user;
     private LocalDateTime lastEdit;
-    /**
-     * Values for additional fields created by User
-     * */
+    /* Values for additional fields created by User */
     @OneToMany(mappedBy = "task")
     private List<AdditionalValue> attributeValues;
 
+    /**
+     * Constructor for Task object. Besides the required params, a Long: id and LocalDateTime: lastEdit properties will be added authomatically.
+     * @param title title of the task
+     * @param complete boolean indicating status of the task
+     * @param user user assigned to the task
+     * @see User
+     * */
     public Task(String title, boolean complete, User user) {
         setTitle(title);
         setComplete(complete);

@@ -14,7 +14,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class User {
-    /**
+    /*
      * The primary key for the User table
      * Ids are automatically generated as sequential integers
      */
@@ -28,16 +28,22 @@ public class User {
     private Address address;
     @OneToMany(mappedBy = "user")
     private List<Task> tasks;
-    /**
+    /*
      * A User can only be assigned a single Role.
      * */
     @OneToOne
     private Role role;
-    /**
+    /*
      * Additional fields/columns created by the User
      * */
     @OneToMany(mappedBy = "user")
-    private List<AdditionalField> additionalAttributes;
+    private List<AdditionalField> additionalFields;
 
-
+    public User(String name, String username, String password, Address address, Role role) {
+        setName(name);
+        setUsername(username);
+        setPassword(password);
+        setAddress(address);
+        setRole(role);
+    }
 }
