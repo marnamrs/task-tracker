@@ -39,5 +39,11 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<AdditionalField> additionalAttributes;
 
-
+    public User(String name, String username, String password, Address address, Role role) {
+        setName(name);
+        setUsername(username);
+        setPassword(password);
+        setAddress(address);
+        setRole(role);
+    }
 }
