@@ -15,7 +15,7 @@
                     <li class="breadcrumb-item active" aria-current="page">New Task</li>
                 </ol>
             </nav>
-
+<!--            TODO add error message modal-->
             <form
                     method="POST"
                     th:action="@{savetask}"
@@ -37,14 +37,14 @@
                                      ></option>
                         </select>
                     </div>
-                     <!--<div class="col">
+                     <div class="col">
                          <label for="isComplete">Status</label>
-                         <select class="form-control" type="number" id="isComplete"  required>
+                         <select class="form-control" th:name="isComplete" th:id="isComplete" id="isComplete"  required>
                              <option selected disabled>Choose status...</option>
-                             <option th:value="0" th:name="*{isComplete}">Pending</option>
-                             <option th:value="1" th:name="*{isComplete}">Completed</option>
+                             <option th:value="0">Not Completed</option>
+                             <option th:value="1">Completed</option>
                          </select>
-                     </div>-->
+                     </div>
                  </div>
                  <button type="submit" class="btn btn-primary my-4">Submit</button>
             </form>
