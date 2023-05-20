@@ -15,6 +15,7 @@ import todo.project.todotracker.repositories.UserRepository;
 import todo.project.todotracker.utils.RoleType;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -60,13 +61,22 @@ public class UserService {
      * @return List<String> of usernames
      * @throws HttpStatus "NOT_FOUND" if no users are present in the database
      */
-    List<String> getAllUsernames(){
+    public List<User> getAllUsers(){
         log.info("Fetching Users");
         List<User> users = userRepository.findAll();
         if(users.isEmpty()){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No users found");
         }
-        List<String> usernames = users.stream().map(User::getUsername).toList();
-        return usernames;
+        //List<String> usernames = users.stream().map(User::getUsername).toList();
+        return users;
     }
+
+    public User getUserById(Long id){
+        Optional<User> user = userRepository.findById(id);
+        if(user.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+        }
+        return user.get();
+    }
+
 }

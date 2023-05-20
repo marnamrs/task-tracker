@@ -36,7 +36,7 @@
                         <td th:text="${task.title}"></td>
                         <td th:text="${task.user.username}"></td>
                         <td th:text="${task.user.address.country}"></td>
-                        <td th:text="${task.isComplete} ? 'Complete' : 'Incomplete'"></td>
+                        <td th:text="${task.isComplete} ? 'Complete' : 'Pending'"></td>
                         <td>000</td>
                     </tr>
                 </tbody>
@@ -47,7 +47,6 @@
                 <li class="page-item"><a class="page-link" href="#">Previous</a></li>
                 <li class="page-item"><a class="page-link" href="#">Next</a></li>
             </ul>
-
         </nav>
     </div>
 </body>

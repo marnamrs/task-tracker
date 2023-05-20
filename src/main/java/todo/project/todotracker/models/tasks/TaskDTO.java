@@ -3,7 +3,17 @@ package todo.project.todotracker.models.tasks;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import java.io.Serializable;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class TaskDTO {
 
     @NotNull
@@ -12,9 +22,9 @@ public class TaskDTO {
     private String title;
 
     //if not status is provided, isComplete will set to false
-    private boolean isComplete = false;
+    private int isComplete = 0;
 
-    private String username;
+    private int userId;
 
 
 }
