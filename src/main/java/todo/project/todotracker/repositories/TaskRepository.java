@@ -1,5 +1,6 @@
 package todo.project.todotracker.repositories;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import todo.project.todotracker.models.tasks.Task;

@@ -23,26 +23,27 @@
                     >
                 <div class="form-group">
                     <label for="title">Title</label>
-                    <input type="text" class="form-control" id="title" th:field="*{title}" maxlength="200" aria-describedby="titleHelp" required>
+                    <input type="text" class="form-control" id="title" th:field="*{title}" maxlength="200" aria-describedby="titleHelp" th:text="${taskDTO.title}"required>
                     <small id="titleHelp" class="form-text form-muted">Max length of 200 characters</small>
                 </div>
                 <div class="form-group row">
                     <div class="col">
                         <label for="userId">User</label>
                         <select class="form-control" th:name="userId" th:id="userId" id="userId" required>
-                            <option selected disabled>Choose user...</option>
+                            <option disabled>Choose user...</option>
                             <option th:each="user:${allUsers}"
                                     th:value="${user.id}"
                                     th:text="${user.username}"
+                                    th:selected="${taskDTO.userId} == user.id"
                                      ></option>
                         </select>
                     </div>
                      <div class="col">
                          <label for="isComplete">Status</label>
                          <select class="form-control" th:name="isComplete" th:id="isComplete" id="isComplete"  required>
-                             <option selected disabled>Choose status...</option>
-                             <option th:value="0">Not Completed</option>
-                             <option th:value="1">Completed</option>
+                             <option disabled>Choose status...</option>
+                             <option th:value="0" th:selected="${taskDTO.isComplete} == 0">Not Completed</option>
+                             <option th:value="1" th:selected="${taskDTO.isComplete} == 1">Completed</option>
                          </select>
                      </div>
                  </div>
