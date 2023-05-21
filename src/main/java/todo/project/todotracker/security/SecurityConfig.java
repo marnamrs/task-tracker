@@ -35,18 +35,14 @@ import static org.springframework.security.config.http.SessionCreationPolicy.*;
 public class SecurityConfig  {
 
 
-//    //instance of AuthenticationManagerBuilder
+   //instance of AuthenticationManagerBuilder
     @Autowired
     private AuthenticationManagerBuilder authManagerBuilder;
     @Autowired
     private DataSource dataSource;
     @Resource
     private UserDetailsService userDetailsService;
-//    @Autowired
-//    public void configureGlobal(AuthenticationManagerBuilder auth)
-//            throws Exception {
-//        auth.jdbcAuthentication().dataSource(dataSource);
-//    }
+
     //Definition of PasswordEncoder
     @Bean
     public PasswordEncoder encoder() {
@@ -67,7 +63,6 @@ public class SecurityConfig  {
     public DaoAuthenticationProvider authProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService);
-//        authProvider.setPasswordEncoder(passwordEncoder);
         return authProvider;
     }
     @Bean
@@ -100,8 +95,6 @@ public class SecurityConfig  {
                     .deleteCookies("JSESSIONID");
         // disable anon user
         // http.anonymous().disable();
-        // add the custom authentication filter to the http security object
-       // http.addFilter(customAuthenticationFilter);
         http.httpBasic();
         // Build the security filter chain to be returned.
         return http.build();

@@ -51,9 +51,7 @@ public class ViewController {
     @ResponseStatus(HttpStatus.OK)
     public String landingController(
             Model model,
-
-            @RequestParam("page") Optional<Integer> page,
-            Authentication auth
+            @RequestParam("page") Optional<Integer> page
     ){
         //pagination
         int currentPage = page.orElse(1);
@@ -99,7 +97,7 @@ public class ViewController {
             }
         } else {
             if(userService.verifyOwnership(task, user.getName())){
-                int status = task.isComplete() == true ? 1 : 0;
+                int status = task.isComplete() ? 1 : 0;
                 model.addAttribute("taskDTO", new TaskDTO(task.getTitle(), status, Math.toIntExact(task.getUser().getId())));
                 model.addAttribute("allUsers", userService.getAllUsers());
                 model.addAttribute("id", id);
@@ -152,7 +150,7 @@ public class ViewController {
     public String postUpdateController(@ModelAttribute("task") TaskDTO taskDTO, @RequestParam("id") int id, Model model, HttpServletResponse httpResponse){
         try{
             Task task = taskService.getTaskById(id);
-            User user = userService.getUserById(Long.valueOf(taskDTO.getUserId()));
+            User user = userService.getUserById((long) taskDTO.getUserId());
             taskService.updateTask(task, taskDTO, user);
         } catch (Exception e){
             model.addAttribute("error", e.getMessage());

@@ -6,6 +6,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.jpa.datatables.repository.DataTablesRepositoryFactoryBean;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import todo.project.todotracker.models.tasks.Task;
@@ -16,6 +18,7 @@ import todo.project.todotracker.services.UserService;
 
 
 @SpringBootApplication(exclude = {UserDetailsServiceAutoConfiguration.class})
+@EnableJpaRepositories(repositoryFactoryBeanClass = DataTablesRepositoryFactoryBean.class)
 public class TodotrackerApplication {
 
 	public static void main(String[] args) {
@@ -27,9 +30,6 @@ public class TodotrackerApplication {
 	public PasswordEncoder passwordEncoder() {
 		return PasswordEncoderFactories.createDelegatingPasswordEncoder();
 	}
-
-/*	@Autowired
-	RoleRepository roleRepository;*/
 	@Autowired
 	UserRepository userRepository;
 	@Autowired
@@ -54,7 +54,7 @@ public class TodotrackerApplication {
 
 			if(taskRepository.findAll().isEmpty() ){
 				taskRepository.save(new Task("To do: create your first task", false, userRepository.findByUsername("user").get()));
-				taskRepository.save(new Task("To do: complete your first task", false, userRepository.findByUsername("user").get()));
+				taskRepository.save(new Task("To do: complete your first task", false, userRepository.findByUsername("user2").get()));
 				taskRepository.save(new Task("To do: take a break", false, userRepository.findByUsername("user").get()));
 			}
 

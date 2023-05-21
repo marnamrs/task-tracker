@@ -33,25 +33,25 @@ public class TaskService {
         int currentPage = pageable.getPageNumber();
         int start = currentPage * pageSize;
         List<Task> tasks = taskRepository.findAll();
-        List<Task> list = null;
+        List<Task> list;
         if(tasks.size() < start){
             list = Collections.emptyList();
         } else {
             int end = Math.min(start + pageSize, tasks.size());
             list = tasks.subList(start, end);
         }
-        Page<Task> taskPage = new PageImpl<Task>(list, PageRequest.of(currentPage, pageSize), tasks.size());
+        Page<Task> taskPage = new PageImpl<>(list, PageRequest.of(currentPage, pageSize), tasks.size());
         return taskPage;
-    };
+    }
     public List<Task> getTasksByUser(User user){
         return taskRepository.findByUser(user.getUsername());
-    };
+    }
     public List <Task> getTasksByTitle(String query){
         return taskRepository.findByTitleContainingIgnoreCase(query);
-    };
+    }
 
     public Task getTaskById(int taskId) {
-        Optional<Task> task = taskRepository.findById(Long.valueOf(taskId));
+        Optional<Task> task = taskRepository.findById((long) taskId);
         if(task.isEmpty()){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found.");
         }
@@ -67,7 +67,7 @@ public class TaskService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Task title length must be between 1 and 200 characters.");
         }
         log.info("Creating new task...");
-        Boolean status = taskDTO.getIsComplete() == 1;
+        boolean status = taskDTO.getIsComplete() == 1;
         Task task = new Task(taskDTO.getTitle(), status, user);
         taskRepository.save(task);
     }
@@ -85,7 +85,7 @@ public class TaskService {
     }
 
     public void deleteTask(int id){
-        Optional<Task> task = taskRepository.findById(Long.valueOf(id));
+        Optional<Task> task = taskRepository.findById((long) id);
         if(task.isEmpty()){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found");
         }

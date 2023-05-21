@@ -5,10 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import todo.project.todotracker.models.users.User;
 
-
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.List;
+
 
 @Entity
 @NoArgsConstructor
@@ -24,9 +23,7 @@ public class Task {
     @ManyToOne
     private User user;
     private LocalDateTime lastEdit;
-    /* Values for additional fields created by User */
-    @OneToMany(mappedBy = "task")
-    private List<AdditionalValue> attributeValues;
+
 
     /**
      * Constructor for Task object. Besides the required params, a Long: id and LocalDateTime: lastEdit properties will be added authomatically.
