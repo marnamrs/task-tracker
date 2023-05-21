@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
 import todo.project.todotracker.models.tasks.Task;
 import todo.project.todotracker.models.tasks.TaskDTO;
 import todo.project.todotracker.models.users.User;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Controller
-public class HomeController {
+public class ViewController {
 
     @Autowired
     TaskService taskService;
@@ -105,7 +106,9 @@ public class HomeController {
         try {
             httpResponse.sendRedirect("/");
         } catch (IOException e) {
+            System.out.println("CATCH: ERROR --> " + e.getMessage());
             model.addAttribute("error", e.getMessage());
+            model.addAttribute("allUsers", userService.getAllUsers());
             return "newtask";
         }
         return null;
@@ -118,6 +121,24 @@ public class HomeController {
             Task task = taskService.getTaskById(id);
             User user = userService.getUserById(Long.valueOf(taskDTO.getUserId()));
             taskService.updateTask(task, taskDTO, user);
+        } catch (Exception e){
+            model.addAttribute("error", e.getMessage());
+            return "index";
+        }
+        try {
+            httpResponse.sendRedirect("/");
+        } catch (IOException e) {
+            model.addAttribute("error", e.getMessage());
+            return "index";
+        }
+        return null;
+    }
+
+    @GetMapping("/delete")
+    @ResponseStatus(HttpStatus.OK)
+    public String deleteController(@RequestParam("task") int id, Model model, HttpServletResponse httpResponse){
+        try{
+           taskService.deleteTask(id);
         } catch (Exception e){
             model.addAttribute("error", e.getMessage());
             return "index";

@@ -84,4 +84,13 @@ public class TaskService {
         taskRepository.save(task);
     }
 
+    public void deleteTask(int id){
+        Optional<Task> task = taskRepository.findById(Long.valueOf(id));
+        if(task.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found");
+        }
+        log.info("Deleting task...");
+        taskRepository.delete(task.get());
+    }
+
 }
