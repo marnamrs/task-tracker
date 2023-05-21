@@ -28,22 +28,22 @@ public class User {
     private Address address;
     @OneToMany(mappedBy = "user")
     private List<Task> tasks;
-    /*
+/*    *//*
      * A User can only be assigned a single Role.
-     * */
+     * *//*
     @OneToOne
-    private Role role;
+    private Role role;*/
     /*
      * Additional fields/columns created by the User
      * */
     @OneToMany(mappedBy = "user")
     private List<AdditionalField> additionalFields;
 
-    public User(String name, String username, String password, Address address, Role role) {
+    public User(String name, String username, String password, Address address) {
         setName(name);
         setUsername(username);
         setPassword(password);
         setAddress(address);
-        setRole(role);
+        //setRole(role);
     }
 }

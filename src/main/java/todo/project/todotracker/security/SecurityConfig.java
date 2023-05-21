@@ -1,36 +1,52 @@
 package todo.project.todotracker.security;
 
+import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.provisioning.JdbcUserDetailsManager;
+import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
+import todo.project.todotracker.services.UserService;
 
-import static org.springframework.security.config.http.SessionCreationPolicy.ALWAYS;
+import javax.sql.DataSource;
+
+import static org.springframework.security.config.http.SessionCreationPolicy.*;
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
-public class SecurityConfig {
+public class SecurityConfig  {
 
-    //TODO check if autowired can be safely deleted
-    //interface to retrieve user information
-//    @Autowired
-//    private UserDetailsService userDetailsService;
 
 //    //instance of AuthenticationManagerBuilder
     @Autowired
     private AuthenticationManagerBuilder authManagerBuilder;
-
-
+    @Autowired
+    private DataSource dataSource;
+    @Resource
+    private UserDetailsService userDetailsService;
+//    @Autowired
+//    public void configureGlobal(AuthenticationManagerBuilder auth)
+//            throws Exception {
+//        auth.jdbcAuthentication().dataSource(dataSource);
+//    }
     //Definition of PasswordEncoder
     @Bean
     public PasswordEncoder encoder() {
@@ -47,9 +63,18 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
-
-
-    //TODO check if custom AuthenticationFilter and AuthorizationFilter are needed
+    @Bean
+    public DaoAuthenticationProvider authProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService);
+//        authProvider.setPasswordEncoder(passwordEncoder);
+        return authProvider;
+    }
+    @Bean
+    public UserDetailsManager users(DataSource source) {
+        JdbcUserDetailsManager user = new JdbcUserDetailsManager(source);
+        return user;
+    }
 
     /**
      * Bean definition for SecurityFilterChain
@@ -59,30 +84,29 @@ public class SecurityConfig {
      */
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-         //CustomAuthenFilter instance created
-        //CustomAuthFilter customAuthenticationFilter = new CustomAuthFilter(authManagerBuilder.getOrBuild());
-        // set the URL that the filter should process
-        //customAuthenticationFilter.setFilterProcessesUrl("/**");
-        // disable Cross Site Request Forgery  protection
-        http.csrf().disable();
-        // set the session creation policy to stateful
+        // uncomment next line to disable Cross Site Request Forgery protection
+        // http.csrf().disable();
+        // set the session creation policy to stateless
         http.sessionManagement().sessionCreationPolicy(ALWAYS);
-        // TODO check is stateless
         // set up authorization for different request matchers and user roles
         http.authorizeHttpRequests((requests) -> requests
-                        //.requestMatchers("/**").permitAll()
-                        //.requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
-                        //.requestMatchers("/api/external/**").permitAll()
-                // TODO set up auth for rest of paths
-                        .anyRequest().permitAll()
-        );
+                .requestMatchers("/edittask").authenticated()
+                .anyRequest().permitAll())
+                .formLogin()
+                    .defaultSuccessUrl("/", true)
+                .and()
+                .logout()
+                    .logoutSuccessUrl("/")
+                    .deleteCookies("JSESSIONID");
+        // disable anon user
+        // http.anonymous().disable();
         // add the custom authentication filter to the http security object
-        //http.addFilter(customAuthenticationFilter);
-        // Add the custom authorization filter before the standard authentication filter.
-        //http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+       // http.addFilter(customAuthenticationFilter);
+        http.httpBasic();
         // Build the security filter chain to be returned.
         return http.build();
     }
+
 
 
 }
