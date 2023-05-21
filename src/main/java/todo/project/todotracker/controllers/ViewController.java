@@ -1,36 +1,26 @@
 package todo.project.todotracker.controllers;
 
-import jakarta.servlet.http.HttpServletRequest;
+
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.context.SecurityContextImpl;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
-import org.springframework.security.web.context.support.SecurityWebApplicationContextUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.view.RedirectView;
-import org.thymeleaf.extras.springsecurity6.util.SpringSecurityContextUtils;
-import org.thymeleaf.spring6.context.webmvc.SpringWebMvcThymeleafRequestContext;
 import todo.project.todotracker.models.tasks.Task;
 import todo.project.todotracker.models.tasks.TaskDTO;
 import todo.project.todotracker.models.users.User;
 import todo.project.todotracker.repositories.TaskRepository;
 import todo.project.todotracker.repositories.UserRepository;
-import todo.project.todotracker.security.MyUserPrincipal;
 import todo.project.todotracker.services.TaskService;
 import todo.project.todotracker.services.UserService;
 
 import java.io.IOException;
-import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -58,12 +48,13 @@ public class ViewController {
     @ResponseStatus(HttpStatus.OK)
     public String landingController(
             Model model,
-            @RequestParam("page") Optional<Integer> page){
+            @RequestParam("page") Optional<Integer> page,
+            Authentication auth
+    ){
+        //pagination
         int currentPage = page.orElse(1);
         Page<Task> taskPage = taskService.getAllTasks(PageRequest.of(currentPage - 1, 10));
-        //model.addAttribute("allTasks", taskService.getAllTasks(currentPage));
         model.addAttribute("allTasks", taskPage);
-
         int numPages = taskPage.getTotalPages();
         if(numPages > 0){
             List<Integer> pageNumbers = IntStream.rangeClosed(1, numPages).boxed().collect(Collectors.toList());
@@ -109,6 +100,11 @@ public class ViewController {
                 model.addAttribute("id", id);
                 return "updatetask";
             }
+            try {
+                httpResponse.sendRedirect("/");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
         return null;
     }
@@ -116,12 +112,8 @@ public class ViewController {
     @RequestMapping("/login")
     @ResponseStatus(HttpStatus.OK)
     public String login(){
-        System.out.println("...loginController #1");
         return "login";
     }
-
-
-
     /** postNewTaskController takes the DTO task object generated in /newtask and tries to retrieve the User, create and save a new Task. If successful, it returns a redirect to the landing page. Failure to create the Task or redirect will reload /new task with an error message.
      * @param taskDTO task DTO with properties obtained through thymeleaf form binding in /newtask page
      * @param model required to display Exception messages, if any
