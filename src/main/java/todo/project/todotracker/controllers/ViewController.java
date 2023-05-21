@@ -134,5 +134,23 @@ public class ViewController {
         return null;
     }
 
+    @GetMapping("/delete")
+    @ResponseStatus(HttpStatus.OK)
+    public String deleteController(@RequestParam("task") int id, Model model, HttpServletResponse httpResponse){
+        try{
+           taskService.deleteTask(id);
+        } catch (Exception e){
+            model.addAttribute("error", e.getMessage());
+            return "index";
+        }
+        try {
+            httpResponse.sendRedirect("/");
+        } catch (IOException e) {
+            model.addAttribute("error", e.getMessage());
+            return "index";
+        }
+        return null;
+    }
+
 
 }
