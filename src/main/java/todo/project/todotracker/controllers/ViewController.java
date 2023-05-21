@@ -1,14 +1,20 @@
 package todo.project.todotracker.controllers;
 
+
+
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.view.RedirectView;
+
 import todo.project.todotracker.models.tasks.Task;
 import todo.project.todotracker.models.tasks.TaskDTO;
 import todo.project.todotracker.models.users.User;
@@ -45,10 +51,13 @@ public class ViewController {
     @ResponseStatus(HttpStatus.OK)
     public String landingController(
             Model model,
-            @RequestParam("page") Optional<Integer> page){
+
+            @RequestParam("page") Optional<Integer> page,
+            Authentication auth
+    ){
+        //pagination
         int currentPage = page.orElse(1);
         Page<Task> taskPage = taskService.getAllTasks(PageRequest.of(currentPage - 1, 10));
-        //model.addAttribute("allTasks", taskService.getAllTasks(currentPage));
         model.addAttribute("allTasks", taskPage);
 
         int numPages = taskPage.getTotalPages();
@@ -78,13 +87,37 @@ public class ViewController {
      */
     @RequestMapping("/editTask")
     @ResponseStatus(HttpStatus.OK)
-    public String updateTaskController(Model model, @RequestParam("task") int id){
+    public String updateTaskController(Model model, @RequestParam("task") int id, HttpServletResponse httpResponse, Authentication user){
         Task task = taskService.getTaskById(id);
-        int status = task.isComplete() == true ? 1 : 0;
-        model.addAttribute("taskDTO", new TaskDTO(task.getTitle(), status, Math.toIntExact(task.getUser().getId())));
-        model.addAttribute("allUsers", userService.getAllUsers());
-        model.addAttribute("id", id);
-        return "updatetask";
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(authentication instanceof AnonymousAuthenticationToken){
+            try {
+                httpResponse.sendRedirect("/login");
+            } catch (IOException e) {
+                model.addAttribute("error", e.getMessage());
+                return "index";
+            }
+        } else {
+            if(userService.verifyOwnership(task, user.getName())){
+                int status = task.isComplete() == true ? 1 : 0;
+                model.addAttribute("taskDTO", new TaskDTO(task.getTitle(), status, Math.toIntExact(task.getUser().getId())));
+                model.addAttribute("allUsers", userService.getAllUsers());
+                model.addAttribute("id", id);
+                return "updatetask";
+            }
+            try {
+                httpResponse.sendRedirect("/");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return null;
+    }
+
+    @RequestMapping("/login")
+    @ResponseStatus(HttpStatus.OK)
+    public String login(){
+        return "login";
     }
 
     /** postNewTaskController takes the DTO task object generated in /newtask and tries to retrieve the User, create and save a new Task. If successful, it returns a redirect to the landing page. Failure to create the Task or redirect will reload /new task with an error message.
@@ -106,7 +139,7 @@ public class ViewController {
         try {
             httpResponse.sendRedirect("/");
         } catch (IOException e) {
-            System.out.println("CATCH: ERROR --> " + e.getMessage());
+
             model.addAttribute("error", e.getMessage());
             model.addAttribute("allUsers", userService.getAllUsers());
             return "newtask";

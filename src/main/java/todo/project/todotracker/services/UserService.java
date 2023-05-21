@@ -6,13 +6,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import todo.project.todotracker.models.tasks.Task;
 import todo.project.todotracker.models.users.Address;
-import todo.project.todotracker.models.users.Role;
 import todo.project.todotracker.models.users.User;
 import todo.project.todotracker.models.users.UserDTO;
-import todo.project.todotracker.repositories.RoleRepository;
 import todo.project.todotracker.repositories.UserRepository;
-import todo.project.todotracker.utils.RoleType;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,8 +21,8 @@ import java.util.Optional;
 public class UserService {
     @Autowired
     UserRepository userRepository;
-    @Autowired
-    RoleRepository roleRepository;
+    /*@Autowired
+    RoleRepository roleRepository;*/
     @Autowired
     PasswordEncoder passwordEncoder;
 
@@ -39,14 +37,14 @@ public class UserService {
         if(userRepository.findByUsername(userDTO.getUsername()).isPresent()){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Username is already taken.");
         }
-        if(!roleRepository.findAll().stream().map(Role::getRoleType).toList().contains(RoleType.valueOf(userDTO.getRoleName()))){
-            throw  new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found");
-        }
+//        if(!roleRepository.findAll().stream().map(Role::getRoleType).toList().contains(RoleType.valueOf(userDTO.getRoleName()))){
+//            throw  new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found");
+//        }
 
         log.info("Creating new user: {}", userDTO.getUsername());
-        Role role = roleRepository.findByRoleType(RoleType.valueOf(userDTO.getRoleName())).get();
+        //Role role = roleRepository.findByRoleType(RoleType.valueOf(userDTO.getRoleName())).get();
         Address address = new Address(userDTO.getCountry(), userDTO.getCity(), userDTO.getStreet(), userDTO.getZipCode());
-        User user = new User(userDTO.getName(), userDTO.getUsername(), userDTO.getPassword(), address, role);
+        User user = new User(userDTO.getName(), userDTO.getUsername(), userDTO.getPassword(), address);
         return saveUser(user);
     }
 
@@ -79,4 +77,11 @@ public class UserService {
         return user.get();
     }
 
+    public boolean verifyOwnership(Task task, String username) {
+        Optional<User> user = userRepository.findByUsername(username);
+        if(user.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+        }
+        return task.getUser().getId() == user.get().getId() ? true : false;
+    }
 }

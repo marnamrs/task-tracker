@@ -25,9 +25,9 @@ public class UserDTO {
     @NotEmpty
     private String password;
 
-    @NotNull
-    @NotEmpty
-    private String roleName; //in UserService layer Role is fetched by roleName from roleRepository
+//    @NotNull
+//    @NotEmpty
+//    private String roleName; //in UserService layer Role is fetched by roleName from roleRepository
 
     //Address required data:
 

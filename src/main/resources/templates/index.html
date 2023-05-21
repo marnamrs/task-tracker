@@ -2,7 +2,8 @@
 <html
         lang="en"
         xmlns="http://www.w3.org/1999/xhtml"
-        xmlns:th="http://www.w3.org/1999/xhtml">
+        xmlns:th="http://www.w3.org/1999/xhtml"
+        xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -16,6 +17,9 @@
         <div align="right">
             <a class="btn btn-primary btn-sm" th:href="@{newtask}" role="button">New Task</a>
             <button type="button" class="btn btn-secondary btn-sm">Search</button>
+
+            <a sec:authorize="isAnonymous()" th:href="@{login}" class="btn btn-link btn-sm"  role="button">Log in</a>
+            <a sec:authorize="isAuthenticated()" th:href="@{logout}" class="btn btn-link btn-sm" role="button">Log out: <span sec:authentication="name"></span></a>
         </div>
         <!-- data visualization -->
         <div class="table-responsive">
@@ -45,8 +49,13 @@
                         <td th:text="${task.isComplete} ? 'Complete' : 'Pending'"></td>
                         <!--task options-->
                         <td>
-                            <a th:href="@{/editTask(task=${task.id})}"
-                            class="btn btn-primary btn-sm">Edit</a>
+
+                            <!--edit-->
+                            <a th:if="${task.user.username == #authentication.name}" th:href="@{/editTask(task=${task.id})}"
+                                  class="btn btn-primary btn-sm">Edit</a>
+                            <a th:unless="${task.user.username == #authentication.name}" class="btn btn-primary btn-sm disabled" aria-disabled="true">Edit</a>
+                            <!--delete-->
+
                             <button type="button" class="btn btn-danger btn-sm"
                                 data-toggle="modal"
                                     th:attr="data-target='#recordDeleteModal'+${task.id}">Delete</button>
