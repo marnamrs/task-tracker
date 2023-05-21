@@ -13,6 +13,7 @@ import todo.project.todotracker.models.users.UserDTO;
 import todo.project.todotracker.repositories.UserRepository;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 
@@ -21,28 +22,20 @@ import java.util.Optional;
 public class UserService {
     @Autowired
     UserRepository userRepository;
-    /*@Autowired
-    RoleRepository roleRepository;*/
     @Autowired
     PasswordEncoder passwordEncoder;
 
-    /** Takes a userDTO and instantiates a User after verifying there are no users with the given username in the database and the role provided for the new user exists.
-     * @param userDTO object with all properties necessary to instantiate user Address, Role and create the new User
+    /** Takes a userDTO and instantiates a User after verifying there are no users with the given username in the database.
+     * @param userDTO object with all properties necessary to instantiate user Address and create the new User
      * @return User as saved in the database (with encoded password)
      * @throws ResponseStatusException HttpStatus.CONFLICT if the username already exists in the database
-     * @throws ResponseStatusException HttpStatus.NOT_FOUND if role is not found in the database
-     * @See userService.saveUser(User user)
+     * &#064;See  userService.saveUser(User user)
      */
     public User createUser(UserDTO userDTO){
         if(userRepository.findByUsername(userDTO.getUsername()).isPresent()){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Username is already taken.");
         }
-//        if(!roleRepository.findAll().stream().map(Role::getRoleType).toList().contains(RoleType.valueOf(userDTO.getRoleName()))){
-//            throw  new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found");
-//        }
-
         log.info("Creating new user: {}", userDTO.getUsername());
-        //Role role = roleRepository.findByRoleType(RoleType.valueOf(userDTO.getRoleName())).get();
         Address address = new Address(userDTO.getCountry(), userDTO.getCity(), userDTO.getStreet(), userDTO.getZipCode());
         User user = new User(userDTO.getName(), userDTO.getUsername(), userDTO.getPassword(), address);
         return saveUser(user);
@@ -57,7 +50,7 @@ public class UserService {
 
     /** Fetch all users from the database and return a list of usernames.
      * @return List<String> of usernames
-     * @throws HttpStatus "NOT_FOUND" if no users are present in the database
+     * @throws ResponseStatusException "NOT_FOUND" if no users are present in the database
      */
     public List<User> getAllUsers(){
         log.info("Fetching Users");
@@ -82,6 +75,6 @@ public class UserService {
         if(user.isEmpty()){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
         }
-        return task.getUser().getId() == user.get().getId() ? true : false;
+        return Objects.equals(task.getUser().getId(), user.get().getId());
     }
 }
