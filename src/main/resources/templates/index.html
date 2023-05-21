@@ -49,11 +49,13 @@
                         <td th:text="${task.isComplete} ? 'Complete' : 'Pending'"></td>
                         <!--task options-->
                         <td>
+
                             <!--edit-->
                             <a th:if="${task.user.username == #authentication.name}" th:href="@{/editTask(task=${task.id})}"
                                   class="btn btn-primary btn-sm">Edit</a>
                             <a th:unless="${task.user.username == #authentication.name}" class="btn btn-primary btn-sm disabled" aria-disabled="true">Edit</a>
                             <!--delete-->
+
                             <button type="button" class="btn btn-danger btn-sm"
                                 data-toggle="modal"
                                     th:attr="data-target='#recordDeleteModal'+${task.id}">Delete</button>

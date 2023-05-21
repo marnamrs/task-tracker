@@ -1,17 +1,20 @@
 package todo.project.todotracker.controllers;
 
 
+
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
 import todo.project.todotracker.models.tasks.Task;
 import todo.project.todotracker.models.tasks.TaskDTO;
 import todo.project.todotracker.models.users.User;
@@ -48,6 +51,7 @@ public class ViewController {
     @ResponseStatus(HttpStatus.OK)
     public String landingController(
             Model model,
+
             @RequestParam("page") Optional<Integer> page,
             Authentication auth
     ){
@@ -55,6 +59,7 @@ public class ViewController {
         int currentPage = page.orElse(1);
         Page<Task> taskPage = taskService.getAllTasks(PageRequest.of(currentPage - 1, 10));
         model.addAttribute("allTasks", taskPage);
+
         int numPages = taskPage.getTotalPages();
         if(numPages > 0){
             List<Integer> pageNumbers = IntStream.rangeClosed(1, numPages).boxed().collect(Collectors.toList());
@@ -114,6 +119,7 @@ public class ViewController {
     public String login(){
         return "login";
     }
+
     /** postNewTaskController takes the DTO task object generated in /newtask and tries to retrieve the User, create and save a new Task. If successful, it returns a redirect to the landing page. Failure to create the Task or redirect will reload /new task with an error message.
      * @param taskDTO task DTO with properties obtained through thymeleaf form binding in /newtask page
      * @param model required to display Exception messages, if any
@@ -133,6 +139,7 @@ public class ViewController {
         try {
             httpResponse.sendRedirect("/");
         } catch (IOException e) {
+
             model.addAttribute("error", e.getMessage());
             model.addAttribute("allUsers", userService.getAllUsers());
             return "newtask";
