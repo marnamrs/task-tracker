@@ -15,11 +15,10 @@
             <li class="breadcrumb-item h2"><a th:href="@{/}">Home</a></li>
             <li class="breadcrumb-item h2 active" aria-current="page">Edit Task</li>
         </ol>
-        <form align="right" th:action="@{/logout}" method="post">
-        <input type="submit" value="Sign Out"/>
-    </form>
     </nav>
-
+    <div align="right"><a sec:authorize="isAnonymous()" th:href="@{login}" class="btn btn-link btn-sm"  role="button">Log in</a>
+        <a sec:authorize="isAuthenticated()" th:href="@{logout}" class="btn btn-link btn-sm" role="button">Log out: <span sec:authentication="name"></span></a>
+    </div>
 
     <form
             method="POST"

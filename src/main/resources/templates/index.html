@@ -17,8 +17,44 @@
         <!-- navigation -->
         <div align="right">
             <a class="btn btn-primary btn-sm" th:href="@{newtask}" role="button">New Task</a>
-            <button type="button" class="btn btn-secondary btn-sm">Search</button>
+            <!-- search -->
+            <button type="button" class="btn btn-secondary btn-sm"
+                    data-toggle="modal"
+                    th:attr="data-target='#searchModal'">Search</button>
+            <!-- search modal -->
+            <div class="modal fade" th:attr="id='searchModal'" tabindex="-1" aria-labelledby="searchModal" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="searchModalTitle">Search</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form                     method="POST"
+                                                      th:action="@{search}"
+                                                      th:object="${searchDTO}">
+                                <label align="left" for="findBy">Search by:</label>
+                                <select class="form-control" th:field="*{findBy}" id="findBy" required>
+                                    <option th:value="null" selected disabled>Choose...</option>
+                                    <option th:value="title">Title</option>
+                                    <option th:value="user">User</option>
+                                </select>
+                                <label for="searchQuery"></label>
+                                <input type="text" class="form-control" id="searchQuery" th:field="*{searchQuery}" required>
+                                <button type="submit" class="btn btn-primary my-4">Search</button>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+<!--                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal end -->
 
+            <!--log options-->
             <a sec:authorize="isAnonymous()" th:href="@{login}" class="btn btn-link btn-sm"  role="button">Log in</a>
             <a sec:authorize="isAuthenticated()" th:href="@{logout}" class="btn btn-link btn-sm" role="button">Log out: <span sec:authentication="name"></span></a>
         </div>
@@ -59,7 +95,6 @@
                                   class="btn btn-primary btn-sm">Edit</a>
                             <a th:unless="${task.user.username == #authentication.name}" class="btn btn-primary btn-sm disabled" aria-disabled="true">Edit</a>
                             <!--delete-->
-
                             <button type="button" class="btn btn-danger btn-sm"
                                 data-toggle="modal"
                                     th:attr="data-target='#recordDeleteModal'+${task.id}">Delete</button>

@@ -10,6 +10,7 @@ import todo.project.todotracker.models.tasks.Task;
 import todo.project.todotracker.models.tasks.TaskDTO;
 import todo.project.todotracker.models.users.User;
 import todo.project.todotracker.repositories.TaskRepository;
+import todo.project.todotracker.repositories.UserRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -17,6 +18,8 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class TaskService {
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     TaskRepository taskRepository;
@@ -46,7 +49,7 @@ public class TaskService {
         return taskPage;
     }
     public List<Task> getTasksByUser(User user){
-        return taskRepository.findByUser(user.getUsername());
+        return taskRepository.findByUser(user);
     }
     public List <Task> getTasksByTitle(String query){
         return taskRepository.findByTitleContainingIgnoreCase(query);
@@ -64,6 +67,21 @@ public class TaskService {
                     Sort.by(sortField).ascending() : Sort.by(sortField).descending();
         Pageable pageable = PageRequest.of(pageNum - 1, 10, sort);
         return taskRepository.findAll(pageable);
+    }
+    public List<Task> getSearch(String field, String query){
+        log.info("Fetching search results from database...");
+        System.out.println("*** field: " + field + "*** query: " + query);
+        switch (field){
+            case "title":
+                return taskRepository.findByTitleContainingIgnoreCase(query);
+            case "user":
+                Optional<User> user = userRepository.findByUsername(query);
+                if(user.isPresent()){
+                    return taskRepository.findByUser(user.get());
+                };
+            default:
+                return taskRepository.findAll();
+        }
     }
 
     /**

@@ -5,7 +5,6 @@ package todo.project.todotracker.controllers;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -15,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import todo.project.todotracker.models.tasks.SearchDTO;
 import todo.project.todotracker.models.tasks.Task;
 import todo.project.todotracker.models.tasks.TaskDTO;
 import todo.project.todotracker.models.users.User;
@@ -25,9 +25,6 @@ import todo.project.todotracker.services.UserService;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Controller
 public class ViewController {
@@ -45,18 +42,6 @@ public class ViewController {
     @RequestMapping("/")
     @ResponseStatus(HttpStatus.OK)
     public String landingController(HttpServletResponse httpResponse){
-//        Model model,
-//        @RequestParam("page") Optional<Integer> page
-//        //pagination
-//        int currentPage = page.orElse(1);
-//        Page<Task> taskPage = taskService.getAllTasks(PageRequest.of(currentPage - 1, 10));
-//        model.addAttribute("allTasks", taskPage);
-//        int numPages = taskPage.getTotalPages();
-//        if(numPages > 0){
-//            List<Integer> pageNumbers = IntStream.rangeClosed(1, numPages).boxed().collect(Collectors.toList());
-//            model.addAttribute("pageNumbers", pageNumbers);
-//        }
-//        return "index";
         try {
             httpResponse.sendRedirect("/1?sort-by=lastEdit&sort-dir=asc");
         } catch (IOException e) {
@@ -65,6 +50,7 @@ public class ViewController {
         return null;
     }
     @RequestMapping("/{page-num}")
+    @ResponseStatus(HttpStatus.OK)
     public String dataViewController(
             @PathVariable("page-num") int pageNum,
             @RequestParam(value = "sort-by", required = false) String sortField,
@@ -86,6 +72,7 @@ public class ViewController {
         model.addAttribute("sortDir", sortDir);
         model.addAttribute("reverseSort", sortDir.equals("asc")?"desc":"asc");
         //data
+        model.addAttribute("searchDTO", new SearchDTO());
         model.addAttribute("allTasks", tasks);
         return "index";
     }
@@ -134,6 +121,15 @@ public class ViewController {
             }
         }
         return null;
+    }
+
+    @RequestMapping("/search")
+    @ResponseStatus(HttpStatus.OK)
+    public String searchController(@ModelAttribute("searchDTO") SearchDTO searchDTO, Model model){
+        List<Task> tasks = taskService.getSearch(searchDTO.getFindBy(), searchDTO.getSearchQuery());
+        System.out.println("*** COMPLETED SEARCH ***" + tasks.stream().count());
+        model.addAttribute("tasks", tasks);
+        return "search";
     }
 
     @RequestMapping("/login")
