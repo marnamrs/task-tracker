@@ -6,8 +6,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.data.jpa.datatables.repository.DataTablesRepositoryFactoryBean;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import todo.project.todotracker.models.tasks.Task;
@@ -18,7 +16,6 @@ import todo.project.todotracker.services.UserService;
 
 
 @SpringBootApplication(exclude = {UserDetailsServiceAutoConfiguration.class})
-@EnableJpaRepositories(repositoryFactoryBeanClass = DataTablesRepositoryFactoryBean.class)
 public class TodotrackerApplication {
 
 	public static void main(String[] args) {
