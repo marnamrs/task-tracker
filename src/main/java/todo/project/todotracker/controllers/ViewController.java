@@ -42,27 +42,51 @@ public class ViewController {
     private UserRepository userRepository;
 
 
-    /** landingController takes the current page as an Optional request parameter to allow pagination of the task list results, injects the appropiate task page in the thymeleaf template, as well as a list of all available pages for navigation purposes.
-     * @param model allows injection of content
-     * @param page int current page (default=1)
-     * @return index.html
-     */
     @RequestMapping("/")
     @ResponseStatus(HttpStatus.OK)
-    public String landingController(
-            Model model,
-            @RequestParam("page") Optional<Integer> page
-    ){
-        //pagination
-        int currentPage = page.orElse(1);
-        Page<Task> taskPage = taskService.getAllTasks(PageRequest.of(currentPage - 1, 10));
-        model.addAttribute("allTasks", taskPage);
-
-        int numPages = taskPage.getTotalPages();
-        if(numPages > 0){
-            List<Integer> pageNumbers = IntStream.rangeClosed(1, numPages).boxed().collect(Collectors.toList());
-            model.addAttribute("pageNumbers", pageNumbers);
+    public String landingController(HttpServletResponse httpResponse){
+//        Model model,
+//        @RequestParam("page") Optional<Integer> page
+//        //pagination
+//        int currentPage = page.orElse(1);
+//        Page<Task> taskPage = taskService.getAllTasks(PageRequest.of(currentPage - 1, 10));
+//        model.addAttribute("allTasks", taskPage);
+//        int numPages = taskPage.getTotalPages();
+//        if(numPages > 0){
+//            List<Integer> pageNumbers = IntStream.rangeClosed(1, numPages).boxed().collect(Collectors.toList());
+//            model.addAttribute("pageNumbers", pageNumbers);
+//        }
+//        return "index";
+        try {
+            httpResponse.sendRedirect("/1?sort-by=lastEdit&sort-dir=asc");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+        return null;
+    }
+    @RequestMapping("/{page-num}")
+    public String dataViewController(
+            @PathVariable("page-num") int pageNum,
+            @RequestParam(value = "sort-by", required = false) String sortField,
+            @RequestParam("sort-dir") String sortDir,
+            Model model
+    ){
+        //sorting default: last edited
+        if(sortField == null){
+            sortField = "lastEdit";
+        }
+        Page<Task> page = taskService.getPaginated(pageNum, sortField, sortDir);
+        List<Task> tasks = page.getContent();
+        //pagination
+        model.addAttribute("currentPage", pageNum);
+        model.addAttribute("totalPages", page.getTotalPages());
+        model.addAttribute("totalTasks", page.getTotalElements());
+        //sorting
+        model.addAttribute("sortField", sortField);
+        model.addAttribute("sortDir", sortDir);
+        model.addAttribute("reverseSort", sortDir.equals("asc")?"desc":"asc");
+        //data
+        model.addAttribute("allTasks", tasks);
         return "index";
     }
 
