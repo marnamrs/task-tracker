@@ -32,7 +32,9 @@ Enrironments used:
 
 ## Run Locally
 
-To setup the project locally, you will need to run a local instance of MySql server and load the Maven dependencies in the `pom.xml`. 
+To setup the project locally, you will need to run a local instance of MySql server and clone the repo into your local. 
+
+After setting up a local copy, build the Maven dependencies in the `pom.xml`. 
 
 Configure `application.properties` file in `src/main/resources` with the following variables or setup the corresponding environment variables:
 
@@ -55,6 +57,8 @@ spring.jpa.show-sql=true
 | `DB_NAME`      |   mysql db/schema name| 
 | `DB_USER`      | mysql server user | 
 | `DB_PASSWORD`      | mysql server password | 
+
+`ddl-auto=update` is set for development purposes.
 
 
 ## Security
