@@ -22,6 +22,7 @@ public class Task {
     private boolean isComplete;
     @ManyToOne
     private User user;
+    private String userCountry;
     private LocalDateTime lastEdit;
 
 
@@ -36,6 +37,7 @@ public class Task {
         setTitle(title);
         setComplete(complete);
         setUser(user);
+        userCountry = user.getAddress().getCountry();
         setLastEdit();
     }
 
@@ -75,5 +77,9 @@ public class Task {
     public void setLastEdit(LocalDateTime date){
         //override: set given date
         this.lastEdit = date;
+    }
+
+    public String getUserCountry(){
+        return user.getAddress().getCountry();
     }
 }

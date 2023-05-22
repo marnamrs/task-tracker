@@ -11,10 +11,13 @@
         <div class="container my-4">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">New Task</li>
+                    <li class="breadcrumb-item h2"><a th:href="@{/}">Home</a></li>
+                    <li class="breadcrumb-item h2 active" aria-current="page">New Task</li>
                 </ol>
             </nav>
+            <div align="right"><a sec:authorize="isAnonymous()" th:href="@{login}" class="btn btn-link btn-sm"  role="button">Log in</a>
+                <a sec:authorize="isAuthenticated()" th:href="@{logout}" class="btn btn-link btn-sm" role="button">Log out: <span sec:authentication="name"></span></a>
+            </div>
             <!-- form -->
             <form
                     method="POST"

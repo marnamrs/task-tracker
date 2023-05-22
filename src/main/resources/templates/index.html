@@ -13,12 +13,48 @@
 </head>
 <body>
     <div class="container my-4" align="center">
-        <h1 align="left">Task Tracker</h1>
+        <div align="left"><a class="font-weight-light h2 text-decoration-none" th:href="@{/}">Task Tracker</a></div>
         <!-- navigation -->
         <div align="right">
             <a class="btn btn-primary btn-sm" th:href="@{newtask}" role="button">New Task</a>
-            <button type="button" class="btn btn-secondary btn-sm">Search</button>
+            <!-- search -->
+            <button type="button" class="btn btn-secondary btn-sm"
+                    data-toggle="modal"
+                    th:attr="data-target='#searchModal'">Search</button>
+            <!-- search modal -->
+            <div class="modal fade" th:attr="id='searchModal'" tabindex="-1" aria-labelledby="searchModal" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="searchModalTitle">Search</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form                     method="POST"
+                                                      th:action="@{search}"
+                                                      th:object="${searchDTO}">
+                                <label align="left" for="findBy">Search by:</label>
+                                <select class="form-control" th:field="*{findBy}" id="findBy" required>
+                                    <option th:value="null" selected disabled>Choose...</option>
+                                    <option th:value="title">Title</option>
+                                    <option th:value="user">User</option>
+                                </select>
+                                <label for="searchQuery"></label>
+                                <input type="text" class="form-control" id="searchQuery" th:field="*{searchQuery}" required>
+                                <button type="submit" class="btn btn-primary my-4">Search</button>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+<!--                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal end -->
 
+            <!--log options-->
             <a sec:authorize="isAnonymous()" th:href="@{login}" class="btn btn-link btn-sm"  role="button">Log in</a>
             <a sec:authorize="isAuthenticated()" th:href="@{logout}" class="btn btn-link btn-sm" role="button">Log out: <span sec:authentication="name"></span></a>
         </div>
@@ -30,20 +66,23 @@
                     >
                 <thead class="thead-light">
                     <tr>
-                        <th scope="col">Title</th>
-                        <th scope="col">Username</th>
-                        <th scope="col">Country</th>
-                        <th scope="col">Status</th>
+                        <th>
+                            <a th:href="@{'/' + ${currentPage} + '?sort-by=title&sort-dir=' + ${reverseSort}}">Title</a>
+                        </th>
+                        <th>
+                            <a th:href="@{'/' + ${currentPage} + '?sort-by=user&sort-dir=' + ${reverseSort}}">Username</a>
+                        </th>
+                        <th>
+                            <a th:href="@{'/' + ${currentPage} + '?sort-by=userCountry&sort-dir=' + ${reverseSort}}">Country</a>
+                        </th>
+                        <th scope="col">
+                            <a th:href="@{'/' + ${currentPage} + '?sort-by=isComplete&sort-dir=' + ${reverseSort}}">Status</a>
+                        </th>
                     </tr>
-<!--                    TODO add functionality for new columns: show additional fields-->
-<!--                    <tr th:if="${#lists.size(user.additionalFields)}" th:each="field : $user.additionalFields">-->
-<!--                        <th scope="col" th:text="${field.name}"></th>-->
-<!--                        <th scope="col">Aa</th>-->
-<!--                    </tr>-->
                 </thead>
                 <tbody>
                 <!-- row for each task -->
-                    <tr th:each="task:${allTasks.content}">
+                    <tr th:each="task:${allTasks}">
                         <td th:text="${task.title}"></td>
                         <td th:text="${task.user.username}"></td>
                         <td th:text="${task.user.address.country}"></td>
@@ -56,7 +95,6 @@
                                   class="btn btn-primary btn-sm">Edit</a>
                             <a th:unless="${task.user.username == #authentication.name}" class="btn btn-primary btn-sm disabled" aria-disabled="true">Edit</a>
                             <!--delete-->
-
                             <button type="button" class="btn btn-danger btn-sm"
                                 data-toggle="modal"
                                     th:attr="data-target='#recordDeleteModal'+${task.id}">Delete</button>
@@ -88,16 +126,13 @@
                 </tbody>
             </table>
         </div>
-        <!-- data pagination -->
-        <nav aria-label="Page navigation">
-            <ul
-                    th:if="${allTasks.totalPages > 0}"
-                    class="pagination pagination-sm justify-content-center"
-                    >
-                <li th:class="page-item" th:each="pageNumber:${pageNumbers}">
-                    <a class="page-link"
-                       th:href="@{/(page=${pageNumber})}"
-                       th:text="${pageNumber}"></a>
+         <!--data pagination-->
+        <nav th:if="${totalPages > 1}" aria-label="Page navigation">
+            <ul class="pagination pagination-sm justify-content-center">
+                <li th:class="page-item" th:each="number:${#numbers.sequence(1, totalPages)}">
+                        <a th:href="@{'/' + ${number} + '?sort-field=' + ${sortField} + '&sort-dir=' + ${sortDir}}"
+                           class="page-link" th:if="${currentPage != number}" th:text="${number}"></a>
+                        <span th:unless="${currentPage != number}" class="page-link active" th:text="${number}"></span>
                 </li>
             </ul>
         </nav>

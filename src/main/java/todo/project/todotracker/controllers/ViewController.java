@@ -5,7 +5,6 @@ package todo.project.todotracker.controllers;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -15,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import todo.project.todotracker.models.tasks.SearchDTO;
 import todo.project.todotracker.models.tasks.Task;
 import todo.project.todotracker.models.tasks.TaskDTO;
 import todo.project.todotracker.models.users.User;
@@ -25,9 +25,6 @@ import todo.project.todotracker.services.UserService;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Controller
 public class ViewController {
@@ -42,27 +39,41 @@ public class ViewController {
     private UserRepository userRepository;
 
 
-    /** landingController takes the current page as an Optional request parameter to allow pagination of the task list results, injects the appropiate task page in the thymeleaf template, as well as a list of all available pages for navigation purposes.
-     * @param model allows injection of content
-     * @param page int current page (default=1)
-     * @return index.html
-     */
     @RequestMapping("/")
     @ResponseStatus(HttpStatus.OK)
-    public String landingController(
-            Model model,
-            @RequestParam("page") Optional<Integer> page
-    ){
-        //pagination
-        int currentPage = page.orElse(1);
-        Page<Task> taskPage = taskService.getAllTasks(PageRequest.of(currentPage - 1, 10));
-        model.addAttribute("allTasks", taskPage);
-
-        int numPages = taskPage.getTotalPages();
-        if(numPages > 0){
-            List<Integer> pageNumbers = IntStream.rangeClosed(1, numPages).boxed().collect(Collectors.toList());
-            model.addAttribute("pageNumbers", pageNumbers);
+    public String landingController(HttpServletResponse httpResponse){
+        try {
+            httpResponse.sendRedirect("/1?sort-by=lastEdit&sort-dir=asc");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+        return null;
+    }
+    @RequestMapping("/{page-num}")
+    @ResponseStatus(HttpStatus.OK)
+    public String dataViewController(
+            @PathVariable("page-num") int pageNum,
+            @RequestParam(value = "sort-by", required = false) String sortField,
+            @RequestParam("sort-dir") String sortDir,
+            Model model
+    ){
+        //sorting default: last edited
+        if(sortField == null){
+            sortField = "lastEdit";
+        }
+        Page<Task> page = taskService.getPaginated(pageNum, sortField, sortDir);
+        List<Task> tasks = page.getContent();
+        //pagination
+        model.addAttribute("currentPage", pageNum);
+        model.addAttribute("totalPages", page.getTotalPages());
+        model.addAttribute("totalTasks", page.getTotalElements());
+        //sorting
+        model.addAttribute("sortField", sortField);
+        model.addAttribute("sortDir", sortDir);
+        model.addAttribute("reverseSort", sortDir.equals("asc")?"desc":"asc");
+        //data
+        model.addAttribute("searchDTO", new SearchDTO());
+        model.addAttribute("allTasks", tasks);
         return "index";
     }
 
@@ -110,6 +121,15 @@ public class ViewController {
             }
         }
         return null;
+    }
+
+    @RequestMapping("/search")
+    @ResponseStatus(HttpStatus.OK)
+    public String searchController(@ModelAttribute("searchDTO") SearchDTO searchDTO, Model model){
+        List<Task> tasks = taskService.getSearch(searchDTO.getFindBy(), searchDTO.getSearchQuery());
+        System.out.println("*** COMPLETED SEARCH ***" + tasks.stream().count());
+        model.addAttribute("tasks", tasks);
+        return "search";
     }
 
     @RequestMapping("/login")
